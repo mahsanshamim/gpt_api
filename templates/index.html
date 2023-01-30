@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<head>
+  <title>OpenAI Quickstart</title>
+  <link rel="shortcut icon" href="{{ url_for('static', path='dog.png') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='dropzone.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='assets/css/app.min.css') }}">
+  <!-- Template CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', path='assets/css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='assets/css/components.css') }}">
+  <!-- Custom style CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', path='assets/css/custom.css') }}">
+  <link rel='shortcut icon' type='image/x-icon' href="{{ url_for('static', path='assets/img/favicon.ico') }}" />
+  
+</head>
+
+<body>
+  <img src="{{ url_for('static', path='dog.png') }}" class="icon" />
+  <h3>Name my pet</h3>
+  <form  class="dropzone dz-clickable" id="mydropzone" action="/gpt/uploadfile" enctype="multipart/form-data" method="post">
+    <div class="dz-message" data-dz-message><span>Drag your image here!</span></div>
+  </form>
+  <div class="image" style="width:100%; height:148px; border-radius:5px; border-radius:3px;">
+    <div class="dropzone">
+      <div class="fallback">
+        <input name="file" type="file" />
+      </div>
+    </div>
+  </div>
+  <form action="/gpt/uploadfile" method="post" enctype="multipart/form-data">
+    <input type="text" name="animal" placeholder="Enter an animal" required />
+    <input type="file" name="file" placeholder="Enter an animal" required />
+    <input type="submit" value="Generate names" />
+  </form>
+  {% if result %}<div class="result">{{ result }}</div>{% endif %}
+  <!-- General JS Scripts -->
+  <script src="{{ url_for('static', path='assets/js/app.min.js') }}"></script>
+  <!-- JS Libraies -->
+  <!-- Page Specific JS File -->
+  <!-- Template JS File -->
+  <script src="{{ url_for('static', path='assets/js/scripts.js') }}"></script>
+  <!-- Custom JS File -->
+  <script src="{{ url_for('static', path='assets/js/custom.js') }}"></script>
+  <script src="{{ url_for('static', path='dropzone.min.js') }}"></script>
+</body>
+<script>
+  Dropzone.autoDiscover = false;
+  var dropzonex = new Dropzone("div.dropzone", {
+    url: "/gpt/uploadfile",
+    maxFilesize: 10,
+    renameFile: function (file) {
+      return "<?php if($element){ echo $element['id'];} ?>";
+    },
+    resizeMimeType: 'image/jpeg',
+    dictDefaultMessage: '<div class="dz-message" data-dz-message><span>Drag your image here!</span></div>',
+    dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
+    dictFallbackText: "Please use the fallback form below to upload your files like in the olden days.",
+    dictFileTooBig: "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB.",
+    dictInvalidFileType: "You can't upload files of this type.",
+    dictResponseError: "Server responded with {{statusCode}} code.",
+    dictCancelUpload: "Cancel upload",
+    dictCancelUploadConfirmation: "Are you sure you want to cancel this upload?",
+    dictRemoveFile: "Remove file",
+    dictMaxFilesExceeded: "You can not upload any more files.",
+    success: function (file, response) {
+      dropzonex.removeFile(file);
+      console.log(response);
+      $("#variation_gallery_" + vid).html(response);
+      //return file.classList.add("dz-success");
+
+    }
+  });
+  dropzonex.on("complete", function (file) {
+    setTimeout(function () {
+      dropzonex.removeFile(file);
+      var timestamp = Date.now();
+    }, 1000);
+  });
+
+  $("#mydropzone").dropzone({
+    maxFiles: 2000,
+    dictDefaultMessage: '<div class="dz-default dz-message"><span>Drop files here to upload</span></div>',
+    url: "/gpt/uploadfile",
+    success: function (file, response) {
+      console.log(response);
+    }
+  }).on("complete", function (file) {
+    setTimeout(function () {
+      $this.removeFile(file);
+      var timestamp = Date.now();
+    }, 1000);
+  });
+</script>
